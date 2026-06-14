@@ -1,0 +1,21 @@
+{
+  "title": "测试报告",
+  "sections": [
+    {
+      "type": "h1",
+      "content": "## 这是markdown标题"
+    },
+    {
+      "type": "body",
+      "content": "这段有**加粗**和*斜体*和emoji 🔴⚠️"
+    },
+    {
+      "type": "body",
+      "content": "还有|伪表格|内容|和---分割线"
+    },
+    {
+      "type": "body",
+      "content": "还有【风险评估】标签和> ⚠️ 引导语"
+    }
+  ]
+}

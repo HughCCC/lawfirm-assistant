@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能法律意见书&amp;格式调整（垦丁—陈13出品）</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header class="app-header">
+        <h1>智能法律意见书&amp;格式调整（垦丁—陈13出品）</h1>
+        <p class="subtitle">【使用说明】</p>
+        <div class="header-bullets">
+            <p class="subtitle">·法律评估意见书功能：需要输入自有API Key，API强则结果准（无广强推ds满血）</p>
+            <p class="subtitle">·格式调整校对功能：可直接使用，无需输入API Key</p>
+            <p class="subtitle">·若有其他问题可邮箱联系</p>
+        </div>
+    </header>
+
+    <main class="app-main">
+        <!-- State 1: Input Form -->
+        <section id="form-state" class="state-panel">
+            <div class="provider-section">
+                <h2 class="section-title">选择 LLM 提供商</h2>
+                <div class="provider-cards" role="radiogroup" aria-label="LLM 提供商">
+                    <label class="provider-card">
+                        <input type="radio" name="provider" value="openai" checked>
+                        <span class="card-content">
+                            <span class="card-name">OpenAI</span>
+                            <span class="card-hint">GPT-4o / GPT-4 Turbo</span>
+                        </span>
+                    </label>
+                    <label class="provider-card">
+                        <input type="radio" name="provider" value="anthropic">
+                        <span class="card-content">
+                            <span class="card-name">Anthropic</span>
+                            <span class="card-hint">Claude Sonnet / Opus</span>
+                        </span>
+                    </label>
+                    <label class="provider-card">
+                        <input type="radio" name="provider" value="deepseek">
+                        <span class="card-content">
+                            <span class="card-name">DeepSeek</span>
+                            <span class="card-hint">DeepSeek-Chat</span>
+                        </span>
+                    </label>
+                    <label class="provider-card">
+                        <input type="radio" name="provider" value="custom">
+                        <span class="card-content">
+                            <span class="card-name">自定义</span>
+                            <span class="card-hint">OpenAI 兼容接口</span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="config-section">
+                <div class="config-row">
+                    <div class="form-group flex-1">
+                        <label for="model-select">模型</label>
+                        <select id="model-select">
+                            <option value="">使用默认模型</option>
+                        </select>
+                    </div>
+                    <div class="form-group flex-1" id="base-url-group" style="display:none;">
+                        <label for="base-url">Base URL（可选）</label>
+                        <input type="url" id="base-url" placeholder="https://api.example.com/v1">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="api-key">API Key</label>
+                    <input type="password" id="api-key" placeholder="在此粘贴您的 API Key…" autocomplete="off">
+                    <p class="hint">API Key 仅在浏览器内存中传递，不会记录或存储。</p>
+                </div>
+            </div>
+
+            <div class="question-section">
+                <h2 class="section-title">请输入您的法律问题</h2>
+                <div class="form-group">
+                    <textarea id="question" rows="8"
+                        placeholder="请详细描述您需要评估的业务场景和法律问题…&#10;&#10;例如：&#10;某游戏公司计划推出一款卡牌手游，玩家可通过付费购买&#34;抽卡券&#34;获取随机角色。部分高价值角色可在第三方平台交易变现。请评估该玩法在中国法律框架下是否构成赌博，并给出合规建议。"></textarea>
+                    <div class="textarea-footer">
+                        <span id="char-count">0 字符</span>
+                        <span class="hint">建议 50 字符以上以获得最佳效果</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <button type="button" class="btn-secondary" id="btn-clear">清空</button>
+                <button type="button" class="btn-primary" id="btn-generate">
+                    <span class="btn-text">生成法律评估意见书 →</span>
+                    <span class="btn-spinner" style="display:none;">
+                        <span class="spinner"></span>
+                        正在生成…
+                    </span>
+                </button>
+            </div>
+
+            <div class="format-section">
+                <h2 class="section-title">格式调整校对</h2>
+                <p class="section-desc">上传 .docx 文件，自动统一为本人严选格式（中文宋体、数字和英文Times New Roman、大标题小二加粗居中、正文字号小四、一级标题至三级标题加粗、四级标题至五级标题及正文首行缩进2字符、固定行距18磅、段前段后各6磅）</p>
+                <div class="format-row">
+                    <div class="form-group flex-1">
+                        <input type="file" id="format-file" accept=".docx" class="file-input">
+                    </div>
+                    <button type="button" class="btn-secondary" id="btn-format">
+                        上传并调整格式
+                    </button>
+                </div>
+                <div id="format-result" class="format-result" style="display:none;">
+                    <span class="format-status" id="format-status"></span>
+                    <a id="format-download" class="btn-download-sm" href="#" download>⬇ 下载调整后的文档</a>
+                </div>
+            </div>
+
+            <!-- Progress display during generation -->
+            <div id="progress-panel" class="progress-panel" style="display:none;">
+                <div class="progress-ring-container">
+                    <svg class="progress-ring" viewBox="0 0 120 120">
+                        <circle class="progress-ring-track"
+                                cx="60" cy="60" r="52"
+                                fill="none"
+                                stroke="#d4d0c8"
+                                stroke-width="8" />
+                        <circle class="progress-ring-fill"
+                                cx="60" cy="60" r="52"
+                                fill="none"
+                                stroke="#c9a962"
+                                stroke-width="8"
+                                stroke-linecap="round"
+                                stroke-dasharray="326.73"
+                                stroke-dashoffset="326.73"
+                                transform="rotate(-90 60 60)" />
+                    </svg>
+                    <div class="progress-ring-center">
+                        <span class="progress-percent" id="progress-percent">0%</span>
+                    </div>
+                </div>
+                <p class="progress-text">正在生成法律评估意见书…</p>
+                <p class="progress-hint">LLM 正在分析法律问题并撰写完整报告，预计需要 60–180 秒</p>
+            </div>
+        </section>
+
+        <!-- State 2: Result / Download -->
+        <section id="result-state" class="state-panel" style="display:none;">
+            <!-- Success -->
+            <div id="result-success" style="display:none;">
+                <div class="result-banner success">
+                    <span class="result-icon">&#10003;</span>
+                    <span>报告生成成功</span>
+                </div>
+                <div class="result-info">
+                    <h3 id="result-title" class="result-title"></h3>
+                    <div class="result-meta">
+                        <span id="result-retries"></span>
+                    </div>
+                    <div class="birats-overview">
+                        <span class="birats-badge">背景介绍</span>
+                        <span class="birats-arrow">→</span>
+                        <span class="birats-badge highlight">评估结论</span>
+                        <span class="birats-arrow">→</span>
+                        <span class="birats-badge">法律分析</span>
+                        <span class="birats-arrow">→</span>
+                        <span class="birats-badge">行业案例</span>
+                        <span class="birats-arrow">→</span>
+                        <span class="birats-badge">风险合规</span>
+                        <span class="birats-arrow">→</span>
+                        <span class="birats-badge">信息来源</span>
+                    </div>
+                </div>
+                <div class="download-section">
+                    <a id="btn-download" class="btn-download" href="#" download>
+                        <span class="download-icon">&#11015;</span>
+                        下载 .docx 文件
+                    </a>
+                </div>
+                <div class="action-bar">
+                    <button type="button" class="btn-secondary" id="btn-new-report">← 生成新的报告</button>
+                </div>
+            </div>
+
+            <!-- Failure -->
+            <div id="result-failure" style="display:none;">
+                <div class="result-banner failure">
+                    <span class="result-icon">&#10007;</span>
+                    <span>报告生成失败</span>
+                </div>
+                <div class="error-detail">
+                    <pre id="error-message"></pre>
+                </div>
+                <div class="action-bar">
+                    <button type="button" class="btn-secondary" id="btn-retry">重新生成</button>
+                    <button type="button" class="btn-secondary" id="btn-back-form">返回修改</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <p>法律评估意见书生成系统 · BIRACS 框架 · 输出 .docx 格式 · 垦丁-陈13出品 · 联系邮箱：hughchen13@kindinglaw.com</p>
+    </footer>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

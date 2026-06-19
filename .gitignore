@@ -4,6 +4,5 @@ __pycache__/
 .DS_Store
 webapp/output/
 .claude/
-封面.docx
 *.command
 *.bat
